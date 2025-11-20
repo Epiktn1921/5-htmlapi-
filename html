@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медиа-центр | Аудио, видео, графика</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --danger: #e84393;
+            --warning: #fdcb6e;
+            --info: #0984e3;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg), var(--darker-bg));
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--info));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--warning);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        /* Медиаплеер */
+        .media-player {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .media-container {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: #000;
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #videoPlayer, #audioPlayer {
+            width: 100%;
+            display: block;
+            max-height: 500px;
+        }
+
+        .media-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            color: #666;
+            flex-direction: column;
+            padding: 40px;
+        }
+
+        .placeholder-content {
+            text-align: center;
+        }
+
+        .placeholder-icon {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .control-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .time-display {
+            font-family: monospace;
+            font-size: 1rem;
+            margin: 0 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            width: 0%;
+            transition: width 0.1s;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 15px;
+            height: 100%;
+            background: var(--light);
+            border-radius: 50%;
+            transform: translateX(50%);
+            opacity: 0.8;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .volume-slider {
+            width: 100px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            background: linear-gradient(135deg, var(--info), #1dd1a1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+        }
+
+        .file-label:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(9, 132, 227, 0.4);
+        }
+
+        /* Canvas */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        #animationCanvas {
+            background: #000;
+            border-radius: 12px;
+            width: 100%;
+            height: 450px;
+            cursor: crosshair;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .canvas-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .canvas-btn {
+            background: linear-gradient(135deg, var(--warning), #ff9ff3);
+            color: var(--dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(253, 203, 110, 0.3);
+        }
+
+        .canvas-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(253, 203, 110, 0.4);
+        }
+
+        .canvas-btn.active {
+            background: linear-gradient(135deg, var(--success), #00cec9);
+            color: white;
+        }
+
+        .animation-settings {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .setting-group label {
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        /* Редактор изображений */
+        .image-editor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .image-editor {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .editor-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .image-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+
+        .canvas-wrapper {
+            background: #000;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #imageCanvas {
+            background: #000;
+            border-radius: 8px;
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        .save-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #formatSelect {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .editor-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-btn {
+            background: linear-gradient(135deg, var(--success), #00cec9);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .sliders-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, var(--danger), #fd79a8);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(232, 67, 147, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(232, 67, 147, 0.4);
+        }
+
+        .save-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px;
+            opacity: 0.7;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .progress-container {
+                order: 1;
+            }
+            
+            .canvas-controls {
+                justify-content: center;
+            }
+            
+            .animation-settings {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Медиа-центр PRO</h1>
+            <p class="subtitle">Полный набор инструментов для работы с аудио, видео, графикой и изображениями</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="media">🎵 Медиаплеер</div>
+            <div class="tab" data-tab="canvas">🎨 Графика и анимация</div>
+            <div class="tab" data-tab="images">🖼️ Обработка изображений</div>
+        </div>
+
+        <!-- Медиаплеер -->
+        <div class="tab-content active" id="media-tab">
+            <h2 class="section-title">Аудио и видео плеер</h2>
+            
+            <div class="media-player">
+                <div class="media-container">
+                    <video id="videoPlayer" controls style="display: none;">
+                        Ваш браузер не поддерживает видео элемент.
+                    </video>
+                    <audio id="audioPlayer" controls style="display: none;">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                    <div id="mediaPlaceholder" class="media-placeholder">
+                        <div class="placeholder-content">
+                            <span class="placeholder-icon">🎬</span>
+                            <p>Загрузите видео или аудио файл для начала воспроизведения</p>
+                            <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7;">Поддерживаются форматы: MP4, WebM, OGG, MP3, WAV</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="control-btn" id="playBtn">
+                        <span>▶️ Воспроизвести</span>
+                    </button>
+                    <button class="control-btn" id="pauseBtn">
+                        <span>⏸️ Пауза</span>
+                    </button>
+                    <button class="control-btn" id="stopBtn">
+                        <span>⏹️ Стоп</span>
+                    </button>
+                    
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                    </div>
+                    
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    
+                    <div class="volume-container">
+                        <span id="volumeIcon">🔊</span>
+                        <input type="range" min="0" max="1" step="0.01" value="1" class="volume-slider" id="volumeSlider">
+                    </div>
+                    
+                    <label class="file-label">
+                        <input type="file" class="file-input" id="videoFile" accept="video/*">
+                        📹 Загрузить видео
+                    </label>
+                    <label class="file-label">
+                        <input type="file" class="file-input" id="audioFile" accept="audio/*">
+                        🎵 Загрузить аудио
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Графика и анимация -->
+        <div class="tab-content" id="canvas-tab">
+            <h2 class="section-title">Графика и анимация на Canvas</h2>
+            
+            <div class="canvas-container">
+                <canvas id="animationCanvas"></canvas>
+                
+                <div class="canvas-controls">
+                    <button class="canvas-btn" id="startAnimation">🚀 Запустить анимацию</button>
+                    <button class="canvas-btn" id="stopAnimation">⏹️ Остановить анимацию</button>
+                    <button class="canvas-btn" id="clearCanvas">🧹 Очистить холст</button>
+                    <button class="canvas-btn" id="changeColor">🎨 Сменить цвет</button>
+                    <button class="canvas-btn" id="drawMode">✏️ Режим рисования</button>
+                </div>
+
+                <div class="animation-settings">
+                    <div class="setting-group">
+                        <label>Скорость частиц:</label>
+                        <input type="range" id="particleSpeed" min="1" max="10" value="3">
+                    </div>
+                    <div class="setting-group">
+                        <label>Размер частиц:</label>
+                        <input type="range" id="particleSize" min="1" max="20" value="8">
+                    </div>
+                    <div class="setting-group">
+                        <label>Интенсивность:</label>
+                        <input type="range" id="particleIntensity" min="1" max="10" value="5">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Обработка изображений -->
+        <div class="tab-content" id="images-tab">
+            <h2 class="section-title">Обработка изображений</h2>
+            
+            <div class="image-editor">
+                <div class="editor-panel">
+                    <div class="upload-section">
+                        <label class="file-label">
+                            <input type="file" class="file-input" id="imageFile" accept="image/*">
+                            📷 Загрузить изображение
+                        </label>
+                        <div class="image-info" id="imageInfo">Размер: - | Формат: -</div>
+                    </div>
+                    
+                    <div class="canvas-wrapper">
+                        <canvas id="imageCanvas"></canvas>
+                    </div>
+                    
+                    <div class="save-section">
+                        <button class="save-btn" id="saveImage">
+                            💾 Сохранить изображение
+                        </button>
+                        <select id="formatSelect">
+                            <option value="png">PNG</option>
+                            <option value="jpeg">JPEG</option>
+                            <option value="webp">WebP</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="editor-panel">
+                    <h3>Фильтры и эффекты</h3>
+                    
+                    <div class="editor-controls">
+                        <button class="filter-btn" data-filter="grayscale">⚫ Черно-белый</button>
+                        <button class="filter-btn" data-filter="sepia">🟫 Сепия</button>
+                        <button class="filter-btn" data-filter="invert">🔄 Инверсия</button>
+                        <button class="filter-btn" data-filter="blur">🌀 Размытие</button>
+                        <button class="filter-btn" data-filter="brightness">☀️ Яркость</button>
+                        <button class="filter-btn" data-filter="contrast">⚡ Контраст</button>
+                        <button class="filter-btn" data-filter="saturate">🌈 Насыщенность</button>
+                        <button class="filter-btn" data-filter="hue">🎨 Оттенок</button>
+                        <button class="filter-btn" data-filter="reset">🔄 Сбросить фильтры</button>
+                    </div>
+                    
+                    <div class="sliders-container">
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Яркость:</span>
+                                <span id="brightnessValue">100%</span>
+                            </div>
+                            <input type="range" min="0" max="200" value="100" class="slider" id="brightnessSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Контраст:</span>
+                                <span id="contrastValue">100%</span>
+                            </div>
+                            <input type="range" min="0" max="200" value="100" class="slider" id="contrastSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Насыщенность:</span>
+                                <span id="saturationValue">100%</span>
+                            </div>
+                            <input type="range" min="0" max="200" value="100" class="slider" id="saturationSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Оттенок:</span>
+                                <span id="hueValue">0°</span>
+                            </div>
+                            <input type="range" min="0" max="360" value="0" class="slider" id="hueSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Размытие:</span>
+                                <span id="blurValue">0px</span>
+                            </div>
+                            <input type="range" min="0" max="10" value="0" step="0.1" class="slider" id="blurSlider">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Медиа-центр PRO &copy; 2023 | Все права защищены | Создано с ❤️ для проекта "КТ №5"</p>
+        </footer>
+    </div>
+
+    <script>
+     
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+       
+        class MediaPlayer {
+            constructor() {
+                this.videoPlayer = document.getElementById('videoPlayer');
+                this.audioPlayer = document.getElementById('audioPlayer');
+                this.playBtn = document.getElementById('playBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressContainer = document.getElementById('progressContainer');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.volumeIcon = document.getElementById('volumeIcon');
+                this.videoFile = document.getElementById('videoFile');
+                this.audioFile = document.getElementById('audioFile');
+                this.currentTime = document.getElementById('currentTime');
+                this.duration = document.getElementById('duration');
+                this.mediaPlaceholder = document.getElementById('mediaPlaceholder');
+                
+                this.currentMedia = null;
+                this.isDragging = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.playBtn.addEventListener('click', () => this.play());
+                this.pauseBtn.addEventListener('click', () => this.pause());
+                this.stopBtn.addEventListener('click', () => this.stop());
+                this.progressContainer.addEventListener('click', (e) => this.setProgress(e));
+                this.progressContainer.addEventListener('mousedown', () => this.isDragging = true);
+                document.addEventListener('mouseup', () => this.isDragging = false);
+                document.addEventListener('mousemove', (e) => {
+                    if (this.isDragging) this.setProgress(e);
+                });
+                this.volumeSlider.addEventListener('input', () => this.setVolume());
+                
+                this.videoFile.addEventListener('change', (e) => this.loadVideo(e));
+                this.audioFile.addEventListener('change', (e) => this.loadAudio(e));
+                
+               
+                setInterval(() => this.updateTime(), 100);
+            }
+            
+            loadVideo(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    this.videoPlayer.src = url;
+                    this.videoPlayer.style.display = 'block';
+                    this.audioPlayer.style.display = 'none';
+                    this.mediaPlaceholder.style.display = 'none';
+                    this.currentMedia = this.videoPlayer;
+                    
+                    this.videoPlayer.onloadedmetadata = () => {
+                        this.updateTime();
+                        this.play();
+                    };
+                }
+            }
+            
+            loadAudio(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    this.audioPlayer.src = url;
+                    this.audioPlayer.style.display = 'block';
+                    this.videoPlayer.style.display = 'none';
+                    this.mediaPlaceholder.style.display = 'none';
+                    this.currentMedia = this.audioPlayer;
+                    
+                    this.audioPlayer.onloadedmetadata = () => {
+                        this.updateTime();
+                        this.play();
+                    };
+                }
+            }
+            
+            play() {
+                if (this.currentMedia) {
+                    this.currentMedia.play();
+                }
+            }
+            
+            pause() {
+                if (this.currentMedia) {
+                    this.currentMedia.pause();
+                }
+            }
+            
+            stop() {
+                if (this.currentMedia) {
+                    this.currentMedia.pause();
+                    this.currentMedia.currentTime = 0;
+                    this.updateProgressBar();
+                    this.updateTime();
+                }
+            }
+            
+            setProgress(e) {
+                if (this.currentMedia && this.currentMedia.duration) {
+                    const rect = this.progressContainer.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    this.currentMedia.currentTime = percent * this.currentMedia.duration;
+                }
+            }
+            
+            updateProgressBar() {
+                if (this.currentMedia && this.currentMedia.duration) {
+                    const progress = (this.currentMedia.currentTime / this.currentMedia.duration) * 100;
+                    this.progressBar.style.width = `${progress}%`;
+                }
+            }
+            
+            setVolume() {
+                if (this.currentMedia) {
+                    this.currentMedia.volume = this.volumeSlider.value;
+                    const volume = this.volumeSlider.value;
+                    if (volume == 0) {
+                        this.volumeIcon.textContent = '🔇';
+                    } else if (volume < 0.5) {
+                        this.volumeIcon.textContent = '🔈';
+                    } else {
+                        this.volumeIcon.textContent = '🔊';
+                    }
+                }
+            }
+            
+            updateTime() {
+                if (this.currentMedia) {
+                    this.updateProgressBar();
+                    this.currentTime.textContent = this.formatTime(this.currentMedia.currentTime);
+                    this.duration.textContent = this.formatTime(this.currentMedia.duration);
+                }
+            }
+            
+            formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+
+        
+        class CanvasAnimation {
+            constructor() {
+                this.canvas = document.getElementById('animationCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.startBtn = document.getElementById('startAnimation');
+                this.stopBtn = document.getElementById('stopAnimation');
+                this.clearBtn = document.getElementById('clearCanvas');
+                this.colorBtn = document.getElementById('changeColor');
+                this.drawBtn = document.getElementById('drawMode');
+                this.speedSlider = document.getElementById('particleSpeed');
+                this.sizeSlider = document.getElementById('particleSize');
+                this.intensitySlider = document.getElementById('particleIntensity');
+                
+                this.animationId = null;
+                this.particles = [];
+                this.hue = 0;
+                this.isDrawing = false;
+                this.drawMode = false;
+                this.particleSpeed = 3;
+                this.particleSize = 8;
+                this.particleIntensity = 5;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setCanvasSize();
+                window.addEventListener('resize', () => this.setCanvasSize());
+                
+                this.startBtn.addEventListener('click', () => this.start());
+                this.stopBtn.addEventListener('click', () => this.stop());
+                this.clearBtn.addEventListener('click', () => this.clear());
+                this.colorBtn.addEventListener('click', () => this.changeColor());
+                this.drawBtn.addEventListener('click', () => this.toggleDrawMode());
+                
+                this.speedSlider.addEventListener('input', () => {
+                    this.particleSpeed = this.speedSlider.value;
+                });
+                
+                this.sizeSlider.addEventListener('input', () => {
+                    this.particleSize = this.sizeSlider.value;
+                });
+                
+                this.intensitySlider.addEventListener('input', () => {
+                    this.particleIntensity = this.intensitySlider.value;
+                });
+                
+               
+                this.canvas.addEventListener('mousedown', () => this.isDrawing = true);
+                this.canvas.addEventListener('mouseup', () => this.isDrawing = false);
+                this.canvas.addEventListener('mousemove', (e) => this.draw(e));
+                this.canvas.addEventListener('mouseleave', () => this.isDrawing = false);
+                
+              
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.isDrawing = true;
+                });
+                
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.draw(e.touches[0]);
+                });
+                
+                this.canvas.addEventListener('touchend', () => {
+                    this.isDrawing = false;
+                });
+            }
+            
+            setCanvasSize() {
+                this.canvas.width = this.canvas.offsetWidth;
+                this.canvas.height = this.canvas.offsetHeight;
+            }
+            
+            start() {
+                if (!this.animationId) {
+                    this.animate();
+                }
+            }
+            
+            stop() {
+                cancelAnimationFrame(this.animationId);
+                this.animationId = null;
+            }
+            
+            clear() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.particles = [];
+            }
+            
+            changeColor() {
+                this.hue = Math.random() * 360;
+            }
+            
+            toggleDrawMode() {
+                this.drawMode = !this.drawMode;
+                this.drawBtn.classList.toggle('active', this.drawMode);
+                this.drawBtn.innerHTML = this.drawMode ? '✏️ Режим частиц' : '✏️ Режим рисования';
+            }
+            
+            draw(event) {
+                if (!this.isDrawing) return;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                if (this.drawMode) {
+                    
+                    this.ctx.lineWidth = 5;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.strokeStyle = `hsl(${this.hue}, 100%, 50%)`;
+                    
+                    if (this.lastX === undefined) {
+                        this.lastX = x;
+                        this.lastY = y;
+                    }
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.lastX, this.lastY);
+                    this.ctx.lineTo(x, y);
+                    this.ctx.stroke();
+                    
+                    this.lastX = x;
+                    this.lastY = y;
+                } else {
+                   
+                    for (let i = 0; i < this.particleIntensity; i++) {
+                        this.particles.push(new Particle(
+                            x, y, 
+                            this.particleSize, 
+                            this.particleSpeed,
+                            this.hue
+                        ));
+                    }
+                }
+            }
+            
+            animate() {
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = 0; i < this.particles.length; i++) {
+                    this.particles[i].update();
+                    this.particles[i].draw(this.ctx);
+                    
+                    if (this.particles[i].size <= 0.2) {
+                        this.particles.splice(i, 1);
+                        i--;
+                    }
+                }
+                
+                this.hue += 0.5;
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        class Particle {
+            constructor(x, y, baseSize, baseSpeed, hue) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * baseSize + 1;
+                this.speedX = Math.random() * baseSpeed - baseSpeed/2;
+                this.speedY = Math.random() * baseSpeed - baseSpeed/2;
+                this.color = `hsl(${hue}, 100%, 50%)`;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+      
+        class ImageEditor {
+            constructor() {
+                this.canvas = document.getElementById('imageCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.imageFile = document.getElementById('imageFile');
+                this.saveBtn = document.getElementById('saveImage');
+                this.formatSelect = document.getElementById('formatSelect');
+                this.filterBtns = document.querySelectorAll('.filter-btn');
+                this.brightnessSlider = document.getElementById('brightnessSlider');
+                this.contrastSlider = document.getElementById('contrastSlider');
+                this.saturationSlider = document.getElementById('saturationSlider');
+                this.hueSlider = document.getElementById('hueSlider');
+                this.blurSlider = document.getElementById('blurSlider');
+                this.brightnessValue = document.getElementById('brightnessValue');
+                this.contrastValue = document.getElementById('contrastValue');
+                this.saturationValue = document.getElementById('saturationValue');
+                this.hueValue = document.getElementById('hueValue');
+                this.blurValue = document.getElementById('blurValue');
+                this.imageInfo = document.getElementById('imageInfo');
+                
+                this.originalImage = null;
+                this.currentFilters = {
+                    brightness: 100,
+                    contrast: 100,
+                    saturation: 100,
+                    hue: 0,
+                    blur: 0,
+                    grayscale: 0,
+                    sepia: 0,
+                    invert: 0
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.imageFile.addEventListener('change', (e) => this.loadImage(e));
+                this.saveBtn.addEventListener('click', () => this.saveImage());
+                
+                this.filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => this.applyFilter(btn));
+                });
+                
+                this.brightnessSlider.addEventListener('input', () => this.updateSlider('brightness'));
+                this.contrastSlider.addEventListener('input', () => this.updateSlider('contrast'));
+                this.saturationSlider.addEventListener('input', () => this.updateSlider('saturation'));
+                this.hueSlider.addEventListener('input', () => this.updateSlider('hue'));
+                this.blurSlider.addEventListener('input', () => this.updateSlider('blur'));
+                
+                this.updateSliderValues();
+                this.saveBtn.disabled = true;
+            }
+            
+            loadImage(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            this.originalImage = img;
+                            this.imageInfo.textContent = `Размер: ${img.width} × ${img.height} | Формат: ${file.type.split('/')[1].toUpperCase()} | Размер: ${(file.size / 1024).toFixed(1)} KB`;
+                            this.resizeCanvas();
+                            this.applyFilters();
+                            this.saveBtn.disabled = false;
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            resizeCanvas() {
+                if (!this.originalImage) return;
+                
+                const maxWidth = this.canvas.parentElement.clientWidth - 40;
+                const maxHeight = 400;
+                
+                let { width, height } = this.calculateAspectRatio(
+                    this.originalImage.width,
+                    this.originalImage.height,
+                    maxWidth,
+                    maxHeight
+                );
+                
+                this.canvas.width = width;
+                this.canvas.height = height;
+            }
+            
+            calculateAspectRatio(srcWidth, srcHeight, maxWidth, maxHeight) {
+                const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+                return {
+                    width: srcWidth * ratio,
+                    height: srcHeight * ratio
+                };
+            }
+            
+            applyFilter(button) {
+                const filter = button.getAttribute('data-filter');
+                
+                switch(filter) {
+                    case 'grayscale':
+                        this.currentFilters.grayscale = this.currentFilters.grayscale ? 0 : 1;
+                        button.classList.toggle('active', this.currentFilters.grayscale);
+                        break;
+                    case 'sepia':
+                        this.currentFilters.sepia = this.currentFilters.sepia ? 0 : 1;
+                        button.classList.toggle('active', this.currentFilters.sepia);
+                        break;
+                    case 'invert':
+                        this.currentFilters.invert = this.currentFilters.invert ? 0 : 1;
+                        button.classList.toggle('active', this.currentFilters.invert);
+                        break;
+                    case 'reset':
+                        this.resetFilters();
+                        break;
+                }
+                
+                this.applyFilters();
+            }
+            
+            resetFilters() {
+                this.currentFilters = {
+                    brightness: 100,
+                    contrast: 100,
+                    saturation: 100,
+                    hue: 0,
+                    blur: 0,
+                    grayscale: 0,
+                    sepia: 0,
+                    invert: 0
+                };
+                
+                this.brightnessSlider.value = 100;
+                this.contrastSlider.value = 100;
+                this.saturationSlider.value = 100;
+                this.hueSlider.value = 0;
+                this.blurSlider.value = 0;
+                
+      
+                this.filterBtns.forEach(btn => {
+                    if (btn.getAttribute('data-filter') !== 'reset') {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                this.updateSliderValues();
+            }
+            
+            updateSlider(type) {
+                this.currentFilters[type] = parseFloat(this[`${type}Slider`].value);
+                this.updateSliderValues();
+                this.applyFilters();
+            }
+            
+            updateSliderValues() {
+                this.brightnessValue.textContent = `${this.currentFilters.brightness}%`;
+                this.contrastValue.textContent = `${this.currentFilters.contrast}%`;
+                this.saturationValue.textContent = `${this.currentFilters.saturation}%`;
+                this.hueValue.textContent = `${this.currentFilters.hue}°`;
+                this.blurValue.textContent = `${this.currentFilters.blur}px`;
+            }
+            
+            applyFilters() {
+                if (!this.originalImage) return;
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                let filterString = '';
+                
+                if (this.currentFilters.grayscale) filterString += 'grayscale(1) ';
+                if (this.currentFilters.sepia) filterString += 'sepia(1) ';
+                if (this.currentFilters.invert) filterString += 'invert(1) ';
+                
+                filterString += `brightness(${this.currentFilters.brightness}%) `;
+                filterString += `contrast(${this.currentFilters.contrast}%) `;
+                filterString += `saturate(${this.currentFilters.saturation}%) `;
+                filterString += `hue-rotate(${this.currentFilters.hue}deg) `;
+                filterString += `blur(${this.currentFilters.blur}px)`;
+                
+                this.ctx.filter = filterString;
+                this.ctx.drawImage(this.originalImage, 0, 0, this.canvas.width, this.canvas.height);
+            }
+            
+            saveImage() {
+                if (!this.originalImage) return;
+                
+                const format = this.formatSelect.value;
+                const mimeType = `image/${format}`;
+                
+                const link = document.createElement('a');
+                link.download = `edited-image.${format}`;
+                link.href = this.canvas.toDataURL(mimeType);
+                link.click();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new MediaPlayer();
+            new CanvasAnimation();
+            new ImageEditor();
+            
+           
+            const canvas = document.getElementById('animationCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 5 + 2;
+                const speedX = Math.random() * 2 - 1;
+                const speedY = Math.random() * 2 - 1;
+                const hue = Math.random() * 360;
+                
+                const particle = new Particle(x, y, size, 2, hue);
+                particle.speedX = speedX;
+                particle.speedY = speedY;
+                
+                const animation = new CanvasAnimation();
+                animation.particles.push(particle);
+            }
+        });
+    </script>
+</body>
+</html>
